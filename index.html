@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>єОселя Пошук Квартир</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            background-color: #f3f4f6; /* Lighter gray background */
+        }
+
+        /* --- noUiSlider Customization (8px Dots) --- */
+        .noUi-target {
+            background: #e5e7eb; /* gray-200 track */
+            border-radius: 9999px;
+            border: none;
+            box-shadow: none;
+            height: 6px; /* Consistent track height */
+        }
+        .noUi-connect {
+            background: #2563eb; /* blue-600 */
+            border-radius: 9999px;
+        }
+        .noUi-handle {
+            border-radius: 50%;
+            border: 2px solid #fff; /* White border for contrast */
+            background: #2563eb; /* blue-600 */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            cursor: pointer;
+            width: 8px; /* Corrected size */
+            height: 8px; /* Corrected size */
+            top: -1px; /* Adjusted for 6px track, 8px handle */
+            right: -4px; /* Adjusted for 8px width */
+        }
+        .noUi-handle:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* Focus ring */
+        }
+        .noUi-handle:hover {
+             background: #1d4ed8; /* blue-700 */
+        }
+        .noUi-handle::before,
+        .noUi-handle::after {
+            display: none; /* Hide default pseudo-elements */
+        }
+        .noui-slider-values { /* Display for noUiSlider */
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* gray-600 */
+        }
+        /* Specific style for calculator slider value display */
+        .calc-slider-value-display {
+            text-align: right; /* Align value to the right */
+            margin-top: 0.5rem;
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* gray-600 */
+            font-weight: 500;
+        }
+        .noUi-target {
+            margin-bottom: 0.25rem; /* Space below slider */
+        }
+
+        /* --- Styling for standard HTML range inputs (8px Dots) --- */
+        input[type="range"].standard-slider {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 6px; /* Consistent height */
+            background: #e5e7eb; /* gray-200 */
+            border-radius: 9999px; outline: none;
+            transition: opacity 0.2s; cursor: pointer;
+            padding: 0; margin: 0.25rem 0; touch-action: none;
+        }
+        input[type="range"].standard-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 8px; /* Corrected size */
+            height: 8px; /* Corrected size */
+            background: #2563eb; /* blue-600 */
+            border-radius: 50%; cursor: pointer;
+            border: 2px solid #fff; /* Match noUiSlider handle border */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            margin-top: -1px; /* Center vertically: (6px track - 8px handle) / 2 */
+        }
+        input[type="range"].standard-slider::-moz-range-thumb {
+            width: 8px; /* Corrected size */
+            height: 8px; /* Corrected size */
+            background: #2563eb; /* blue-600 */
+            border-radius: 50%; cursor: pointer;
+            border: 2px solid #fff; /* Match noUiSlider handle border */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+        input[type="range"].standard-slider:focus-visible::-webkit-slider-thumb {
+             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* Focus ring */
+        }
+        input[type="range"].standard-slider:focus-visible::-moz-range-thumb {
+             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* Focus ring */
+        }
+        input[type="range"].standard-slider:hover::-webkit-slider-thumb { background: #1d4ed8; /* blue-700 */ }
+        input[type="range"].standard-slider:hover::-moz-range-thumb { background: #1d4ed8; /* blue-700 */ }
+        input[type="range"].standard-slider:disabled { cursor: not-allowed; opacity: 0.6; }
+        input[type="range"].standard-slider:disabled::-webkit-slider-thumb { background: #9ca3af; /* gray-400 */ cursor: not-allowed; border-color: #e5e7eb; }
+        input[type="range"].standard-slider:disabled::-moz-range-thumb { background: #9ca3af; /* gray-400 */ cursor: not-allowed; border-color: #e5e7eb; }
+
+        .standard-slider-values {
+            display: flex; justify-content: space-between;
+            margin-top: 0.5rem; font-size: 0.875rem; color: #4b5563; /* gray-600 */
+        }
+        .single-slider-value-center {
+             text-align: center;
+             margin-top: 0.5rem; font-size: 0.875rem; color: #4b5563; /* gray-600 */
+        }
+
+        /* --- Button Group --- */
+        .button-group-wrapper { display: inline-flex; border-radius: 0.375rem; /* rounded-md */ overflow: hidden; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .button-group-button {
+            padding: 0.5rem 0.75rem; /* Slightly more padding */
+            background-color: #fff; /* White background */
+            color: #374151; /* gray-700 */
+            font-weight: 500; /* medium */
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            border: 1px solid #d1d5db; /* gray-300 */
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.25rem;
+            user-select: none;
+            flex-grow: 1; text-align: center;
+            margin: 0;
+        }
+        .button-group-button:not(:first-child) { border-left-width: 0; }
+        .button-group-button:hover { background-color: #f9fafb; /* gray-50 */ border-color: #9ca3af; /* gray-400 */ }
+        .button-group-button.selected { background-color: #3b82f6; color: #fff; border-color: #3b82f6; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+        .button-group-button:disabled { background-color: #f9fafb; color: #9ca3af; cursor: not-allowed; border-color: #e5e7eb; }
+        .button-group-button:focus-visible { outline: 2px solid #2563eb; outline-offset: 1px; z-index: 1; }
+
+        /* --- Property Card --- */
+        .property-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex; flex-direction: column; height: 100%;
+            background-color: #fff;
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04); /* Softer shadow */
+            overflow: hidden;
+            border: 1px solid #e5e7eb; /* gray-200 border */
+        }
+        .property-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Standard hover shadow */
+        }
+        .property-card img {
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            width: 100%;
+            border-bottom: 1px solid #e5e7eb; /* Separator line */
+        }
+        .property-card .card-content {
+            padding: 1rem; /* p-4 */
+            display: flex; flex-direction: column; flex-grow: 1;
+        }
+        .property-card .details-footer {
+            margin-top: auto; /* Pushes footer to bottom */
+            padding-top: 0.75rem; /* pt-3 */
+            border-top: 1px solid #e5e7eb; /* gray-200 */
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* gray-600 */
+        }
+        .eligibility-badge {
+            display: inline-flex; /* To allow padding and centering */
+            align-items: center;
+            gap: 0.3rem; /* Space between icon and text */
+            padding: 0.25rem 0.6rem; /* py-1 px-2.5 */
+            border-radius: 9999px; /* rounded-full */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* semibold */
+            line-height: 1; /* Ensure consistent height */
+        }
+        .eligibility-badge.eligible { background-color: #dcfce7; color: #166534; /* green-100 text-green-800 */ }
+        .eligibility-badge.not-eligible { background-color: #fee2e2; color: #991b1b; /* red-100 text-red-800 */ }
+        .eligibility-badge svg { width: 0.8rem; height: 0.8rem; }
+
+        /* --- Select Dropdown --- */
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        select:focus {
+            border-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* Lighter focus ring */
+        }
+
+         optgroup {
+            font-weight: 600; font-style: normal;
+            color: #1f2937; /* gray-800 */
+            background-color: #f3f4f6; /* gray-100 */
+            padding: 0.3rem 0.75rem; /* Slightly more padding */
+            margin-top: 0.25rem;
+        }
+
+        /* --- Loading Overlay --- */
+        #loading-overlay {
+            position: absolute; inset: 0;
+            background-color: rgba(255, 255, 255, 0.85); /* Slightly more opaque */
+            backdrop-filter: blur(2px); /* Optional blur effect */
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10;
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0; visibility: hidden;
+        }
+        #loading-overlay.visible { opacity: 1; visibility: visible; }
+        .spinner {
+            border: 4px solid #e5e7eb; /* gray-200 */
+            border-top: 4px solid #3b82f6; /* blue-500 */
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- Modal Styles --- */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            display: flex; justify-content: center; align-items: center;
+            z-index: 50; /* Ensure it's above everything */
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content {
+            background-color: #fff;
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 90%;
+            width: 500px; /* Adjust as needed */
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-close-button {
+            position: absolute; top: 0.75rem; right: 0.75rem;
+            background: none; border: none; font-size: 1.5rem;
+            color: #6b7280; cursor: pointer; line-height: 1;
+        }
+        .modal-close-button:hover { color: #1f2937; }
+
+        /* --- Drag & Drop Area --- */
+        .drag-drop-area {
+            border: 2px dashed #d1d5db; /* gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 1.5rem; /* p-6 */
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+            background-color: #f9fafb; /* gray-50 */
+        }
+        .drag-drop-area.drag-over {
+            border-color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .drag-drop-area p {
+            color: #6b7280; /* gray-500 */
+            font-size: 0.875rem; /* text-sm */
+        }
+        .drag-drop-area span {
+            color: #3b82f6; /* blue-500 */
+            font-weight: 500;
+        }
+        #image-preview-container {
+            margin-top: 1rem; /* mt-4 */
+            display: flex;
+            gap: 0.5rem; /* gap-2 */
+            flex-wrap: wrap;
+        }
+        #image-preview-container img {
+            max-height: 80px; /* Limit preview height */
+            max-width: 80px;
+            object-fit: cover;
+            border-radius: 0.25rem; /* rounded */
+            border: 1px solid #e5e7eb; /* gray-200 */
+        }
+
+        /* --- Calculator Styles --- */
+        .calculator-section {
+             background-color: #ffffff;
+             border: 1px solid #e5e7eb; /* gray-200 */
+             border-radius: 0.5rem; /* rounded-lg */
+             padding: 1.5rem; /* p-6 */
+             margin-top: 2rem; /* mt-8 */
+        }
+        .calculator-input-group {
+            position: relative;
+        }
+        .calculator-input-group span { /* For % symbol */
+             position: absolute;
+             top: 50%;
+             right: 0.75rem; /* px-3 */
+             transform: translateY(-50%);
+             color: #6b7280; /* gray-500 */
+             font-size: 0.875rem; /* text-sm */
+             pointer-events: none; /* Make symbol non-interactive */
+        }
+        .calculator-results dt {
+            color: #6b7280; /* gray-500 */
+            font-size: 0.875rem; /* text-sm */
+        }
+         .calculator-results dd {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* semibold */
+            color: #1f2937; /* gray-800 */
+        }
+
+
+        /* Utility */
+        .hidden { display: none; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <header class="bg-blue-600 text-white py-3 sm:py-4 shadow-md sticky top-0 z-20 rounded-b-lg">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="logo text-lg sm:text-xl font-bold">єОселя Пошук</div>
+            <nav>
+                <ul class="flex space-x-3 sm:space-x-4 text-sm sm:text-base">
+                    <li><a href="https://eoselia.diia.gov.ua/" target="_blank" rel="noopener noreferrer" class="hover:text-blue-200 transition duration-150 ease-in-out">Про єОселя</a></li>
+                    <li><a href="#" class="hover:text-blue-200 transition duration-150 ease-in-out">Контакти</a></li>
+                    <li><a href="#" id="add-property-link" class="hover:text-blue-200 transition duration-150 ease-in-out hidden sm:inline cursor-pointer">Додати об'єкт</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-6 sm:mt-8 p-4">
+        <h1 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-6 text-center">Знайдіть Квартири за Програмою єОселя</h1>
+
+        <section aria-labelledby="filters-heading" class="search-filters bg-white p-5 sm:p-6 rounded-lg shadow-md mb-8 relative">
+            <h2 id="filters-heading" class="sr-only">Фільтри пошуку</h2>
+
+            <div id="loading-overlay">
+                <div class="spinner" role="status" aria-label="Завантаження..."></div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-6">
+
+                <div class="sm:col-span-1">
+                    <label for="city" class="block text-gray-700 text-sm font-bold mb-1">Місто / Обласний центр</label>
+                    <select id="city" name="city" class="shadow-sm appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-150 ease-in-out">
+                        <option value="">Всі міста / регіони</option>
+                        <option value="Kyiv">м. Київ</option>
+                        <optgroup label="Вінницька обл."><option value="Vinnytsia">Вінниця</option></optgroup>
+                        <optgroup label="Волинська обл."><option value="Lutsk">Луцьк</option></optgroup>
+                        <optgroup label="Дніпропетровська обл."><option value="Dnipro">Дніпро</option></optgroup>
+                        <optgroup label="Житомирська обл."><option value="Zhytomyr">Житомир</option></optgroup>
+                        <optgroup label="Закарпатська обл."><option value="Uzhhorod">Ужгород</option></optgroup>
+                        <optgroup label="Запорізька обл."><option value="Zaporizhzhia">Запоріжжя</option></optgroup>
+                        <optgroup label="Івано-Франківська обл."><option value="Ivano-Frankivsk">Івано-Франківськ</option></optgroup>
+                        <optgroup label="Київська обл.">
+                            <option value="Bila Tserkva">Біла Церква</option>
+                            <option value="Brovary">Бровари</option>
+                            <option value="Boryspil">Бориспіль</option>
+                            <option value="Fastiv">Фастів</option>
+                            <option value="Irpin">Ірпінь</option>
+                            <option value="Obukhiv">Обухів</option>
+                            <option value="Vyshhorod">Вишгород</option>
+                         </optgroup>
+                        <optgroup label="Кіровоградська обл."><option value="Kropyvnytskyi">Кропивницький</option></optgroup>
+                        <optgroup label="Львівська обл."><option value="Lviv">Львів</option></optgroup>
+                        <optgroup label="Миколаївська обл."><option value="Mykolaiv">Миколаїв</option></optgroup>
+                        <optgroup label="Одеська обл."><option value="Odesa">Одеса</option></optgroup>
+                        <optgroup label="Полтавська обл."><option value="Poltava">Полтава</option></optgroup>
+                        <optgroup label="Рівненська обл."><option value="Rivne">Рівне</option></optgroup>
+                        <optgroup label="Сумська обл."><option value="Sumy">Суми</option></optgroup>
+                        <optgroup label="Тернопільська обл."><option value="Ternopil">Тернопіль</option></optgroup>
+                        <optgroup label="Харківська обл."><option value="Kharkiv">Харків</option></optgroup>
+                        <optgroup label="Херсонська обл."><option value="Kherson">Херсон</option></optgroup>
+                        <optgroup label="Хмельницька обл."><option value="Khmelnytskyi">Хмельницький</option></optgroup>
+                        <optgroup label="Черкаська обл."><option value="Cherkasy">Черкаси</option></optgroup>
+                        <optgroup label="Чернівецька обл."><option value="Chernivtsi">Чернівці</option></optgroup>
+                        <optgroup label="Чернігівська обл."><option value="Chernihiv">Чернігів</option></optgroup>
+                    </select>
+                </div>
+
+                <div class="sm:col-span-1">
+                    <label for="rooms" class="block text-gray-700 text-sm font-bold mb-1">Кількість кімнат</label>
+                    <select id="rooms" name="rooms" class="shadow-sm appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-150 ease-in-out">
+                        <option value="">Будь-яка</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4+</option>
+                    </select>
+                </div>
+
+                <div class="sm:col-span-2 md:col-span-1 lg:col-span-2">
+                     <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+                         <label class="block text-gray-700 text-sm font-bold">Ціна</label>
+                         <div id="currency_selector" class="button-group-wrapper" role="radiogroup" aria-labelledby="currency-label">
+                             <span id="currency-label" class="sr-only">Валюта</span>
+                             <button type="button" role="radio" aria-checked="true" data-currency="UAH" class="button-group-button selected">UAH</button>
+                             <button type="button" role="radio" aria-checked="false" data-currency="USD" class="button-group-button">USD</button>
+                             <button type="button" role="radio" aria-checked="false" data-currency="EUR" class="button-group-button">EUR</button>
+                         </div>
+                     </div>
+                    <div id="price_slider"></div>
+                    <div class="noui-slider-values">
+                        <span id="min_price_display">0</span>
+                        <span id="max_price_display">6,000,000</span>
+                    </div>
+                </div>
+
+                <div class="sm:col-span-1">
+                    <label class="block text-gray-700 text-sm font-bold mb-1">Тип програми</label>
+                    <div id="program_selector" class="button-group-wrapper w-full" role="radiogroup" aria-labelledby="program-type-label">
+                        <span id="program-type-label" class="sr-only">Тип програми єОселя</span>
+                        <button type="button" role="radio" aria-checked="true" data-program="" class="button-group-button selected">Будь-яка</button>
+                        <button type="button" role="radio" aria-checked="false" data-program="3" class="button-group-button">3%</button>
+                        <button type="button" role="radio" aria-checked="false" data-program="7" class="button-group-button">7%</button>
+                    </div>
+                </div>
+
+                <div class="sm:col-span-1">
+                    <label for="property_age_slider" class="block text-gray-700 text-sm font-bold mb-1">Макс. вік будинку (роки)</label>
+                     <input type="range" id="property_age_slider" name="property_age" min="0" max="10" value="10" class="standard-slider" aria-labelledby="property-age-label">
+                     <div class="standard-slider-values">
+                         <span id="min_age_display">0</span>
+                         <span id="max_age_display">10</span>
+                     </div>
+                     <p id="program_age_limit_text" class="text-xs text-gray-500 text-center mt-1 h-4"></p>
+                     <span id="property-age-label" class="sr-only">Максимальний вік будинку</span>
+                 </div>
+
+                <div class="sm:col-span-1">
+                    <label for="family_size_slider" class="block text-gray-700 text-sm font-bold mb-1">Розмір сім'ї</label>
+                    <input type="range" id="family_size_slider" name="family_size" min="1" max="10" value="1" class="standard-slider w-full" aria-labelledby="family-size-label">
+                    <p id="family_size_display" class="single-slider-value-center">1 особа</p>
+                    <span id="family-size-label" class="sr-only">Розмір сім'ї</span>
+                </div>
+
+                <div class="sm:col-span-1">
+                    <label id="area_label" class="block text-gray-700 text-sm font-bold mb-2">Площа: 20 - 120 (м²)</label>
+                     <div id="area_slider"></div>
+                    <div class="noui-slider-values">
+                        <span id="min_area_display">20</span>
+                        <span id="max_area_display">120</span>
+                    </div>
+                    <p id="recommended_area_text" class="text-xs text-gray-500 text-center mt-1 h-4"></p>
+                 </div>
+
+                <div class="sm:col-span-2 md:col-span-1 lg:col-span-2">
+                    <label id="max_distance_label" for="max_distance_slider" class="block text-gray-700 text-sm font-bold mb-1">Макс. відстань від міста (км)</label>
+                    <input type="range" id="max_distance_slider" name="max_distance" min="0" max="50" value="50" step="5" class="standard-slider w-full" disabled aria-labelledby="max-distance-label">
+                     <div class="standard-slider-values">
+                         <span id="min_distance_display">0</span>
+                         <span id="max_distance_display">50</span>
+                     </div>
+                    <p id="distance_disabled_text" class="text-xs text-gray-500 text-center mt-1 h-4">Оберіть місто для активації</p>
+                </div>
+
+                <div class="sm:col-span-1 flex items-center self-center">
+                    <input type="checkbox" id="hide_not_eligible" name="hide_not_eligible" class="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                    <label for="hide_not_eligible" class="text-gray-700 text-sm font-medium cursor-pointer select-none">Тільки підходящі</label>
+                </div>
+
+                <div class="sm:col-span-1 md:col-span-3 lg:col-span-1 flex items-end justify-end gap-3 self-end">
+                    <button id="reset_button" type="button" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-5 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1 transition duration-150 ease-in-out w-full sm:w-auto">Скинути</button>
+                    <button id="search_button" type="button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1 transition duration-150 ease-in-out w-full sm:w-auto">Пошук</button>
+                </div>
+            </div>
+        </section>
+
+        <section aria-labelledby="calculator-heading" class="calculator-section mb-8">
+            <h2 id="calculator-heading" class="text-xl font-semibold mb-6 text-gray-800">Розрахунок платежу за кредитом</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+                <div class="lg:col-span-2">
+                    <label id="calc-property-value-label" for="calc-property-value-slider" class="block text-sm font-medium text-gray-700 mb-1">Вартість нерухомості: 1 500 000 UAH</label>
+                    <div id="calc-property-value-slider"></div>
+                     <div class="noui-slider-values">
+                         <span id="calc-min-prop-value">0</span>
+                         <span id="calc-max-prop-value">10 000 000</span>
+                     </div>
+                </div>
+                <div>
+                     <label for="calc-down-payment-percent-slider" class="block text-sm font-medium text-gray-700 mb-1">Внесок: <span id="calc-down-payment-percent-display">20</span>%</label>
+                     <div id="calc-down-payment-percent-slider"></div>
+                      <div class="noui-slider-values">
+                          <span id="calc-min-down-payment-percent">10%</span>
+                          <span id="calc-max-down-payment-percent">100%</span>
+                      </div>
+                      <p class="text-xs text-gray-500 mt-1">Мінімальний внесок: 10%</p>
+                </div>
+                 <div>
+                    <label for="calc-term-years" class="block text-sm font-medium text-gray-700 mb-1">Термін кредиту, років</label>
+                    <input type="number" id="calc-term-years" min="1" max="30" step="1" value="20" class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Річна ставка, %</label>
+                     <div id="calc-interest-rate-selector" class="button-group-wrapper w-full" role="radiogroup" aria-labelledby="calc-rate-label">
+                         <span id="calc-rate-label" class="sr-only">Річна ставка</span>
+                         <button type="button" role="radio" aria-checked="false" data-rate="3" class="button-group-button">3%</button>
+                         <button type="button" role="radio" aria-checked="true" data-rate="7" class="button-group-button selected">7%</button>
+                     </div>
+                     <p class="text-xs text-gray-500 mt-1">Ставка * 1.1; через 10 років +3%</p>
+                </div>
+                 <div class="md:col-span-2 lg:col-span-1 flex flex-col justify-end">
+                     {/* Calculation is now automatic */}
+                 </div>
+            </div>
+             <div class="mt-6 pt-6 border-t border-gray-200">
+                 <dl class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 calculator-results">
+                     <div>
+                         <dt>Перший внесок</dt>
+                         <dd id="calc-down-payment-uah-display">0 UAH</dd>
+                     </div>
+                     <div>
+                         <dt>Сума кредиту</dt>
+                         <dd id="calc-loan-amount">0 UAH</dd>
+                     </div>
+                     <div>
+                         <dt>Щомісячний платіж (перші 10 р.)</dt>
+                         <dd id="calc-monthly-payment">0 UAH</dd>
+                     </div>
+                 </dl>
+             </div>
+        </section>
+
+        <section id="results" aria-live="polite" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <p id="no-results-message" class="text-gray-500 text-center col-span-full hidden">Не знайдено об'єктів за вашими критеріями.</p>
+        </section>
+    </main>
+
+     <div id="add-property-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="modal-close-btn" class="modal-close-button" aria-label="Закрити">&times;</button>
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Додати новий об'єкт</h2>
+            <form id="add-property-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="new-city" class="block text-sm font-medium text-gray-700 mb-1">Місто</label>
+                        <input type="text" id="new-city" name="city" required class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div>
+                        <label for="new-rooms" class="block text-sm font-medium text-gray-700 mb-1">Кімнати</label>
+                        <input type="number" id="new-rooms" name="rooms" min="1" required class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div>
+                        <label for="new-price" class="block text-sm font-medium text-gray-700 mb-1">Ціна (UAH)</label>
+                        <input type="number" id="new-price" name="price" min="0" required class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div>
+                        <label for="new-area" class="block text-sm font-medium text-gray-700 mb-1">Площа (м²)</label>
+                        <input type="number" id="new-area" name="area" min="1" required class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="new-address" class="block text-sm font-medium text-gray-700 mb-1">Адреса</label>
+                        <input type="text" id="new-address" name="address" required class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div>
+                        <label for="new-year" class="block text-sm font-medium text-gray-700 mb-1">Рік побудови</label>
+                        <input type="number" id="new-year" name="yearBuilt" min="1900" max="2025" required class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div class="md:col-span-2">
+                         <label for="new-image-upload" class="block text-sm font-medium text-gray-700 mb-1">Зображення</label>
+                         <div id="drag-drop-area" class="drag-drop-area">
+                             <input type="file" id="new-image-upload" name="imageFile" accept="image/*" class="hidden">
+                             <p>Перетягніть файл сюди або <span class="font-semibold text-blue-600">натисніть для вибору</span></p>
+                         </div>
+                         <div id="image-preview-container"></div>
+                    </div>
+                     <div class="md:col-span-2">
+                        <label for="new-description" class="block text-sm font-medium text-gray-700 mb-1">Опис</label>
+                        <textarea id="new-description" name="description" rows="3" class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+                    </div>
+                    </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="modal-cancel-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-400">
+                        Скасувати
+                    </button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        Зберегти
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <footer class="bg-gray-800 text-gray-300 py-4 mt-12 text-center text-sm rounded-t-lg">
+        <p>&copy; <span id="current_year"></span> Пошук Квартир UA. Всі права захищено.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+
+    <script>
+        const propertiesData = [
+             { id: 1, city: "Kyiv", rooms: 2, price: 3200000, area: 65, address: "вул. Шевченка, 12", yearBuilt: 2021, images: ["https://placehold.co/400x300/A9D8C8/333333?text=Київ+Квартира+1"], description: "Сучасна 2-кімнатна квартира в новобудові.", isEligible: true, lat: 50.4501, lon: 30.5234 },
+             { id: 2, city: "Lviv", rooms: 3, price: 4800000, area: 85, address: "пл. Ринок, 5", yearBuilt: 2018, images: ["https://placehold.co/400x300/FDBA74/333333?text=Львів+Квартира+2"], description: "Простора 3-кімнатна квартира біля історичного центру.", isEligible: true, lat: 49.8397, lon: 24.0297 },
+             { id: 3, city: "Odesa", rooms: 1, price: 2000000, area: 40, address: "вул. Дерибасівська, 21", yearBuilt: 2022, images: ["https://placehold.co/400x300/FBCFE8/333333?text=Одеса+Квартира+3"], description: "Затишна 1-кімнатна студія, нещодавно збудована.", isEligible: true, lat: 46.4825, lon: 30.7233 },
+             { id: 4, city: "Kyiv", rooms: 3, price: 5800000, area: 90, address: "вул. Хрещатик, 25", yearBuilt: 2019, images: ["https://placehold.co/400x300/BFDBFE/333333?text=Київ+Квартира+4"], description: "Комфортна 3-кімнатна квартира в центрі.", isEligible: true, lat: 50.4450, lon: 30.5200 },
+             { id: 5, city: "Lviv", rooms: 2, price: 3500000, area: 60, address: "просп. Свободи, 10", yearBuilt: 2017, images: ["https://placehold.co/400x300/DDD6FE/333333?text=Львів+Квартира+5"], description: "Стильна 2-кімнатна квартира, 2017 року.", isEligible: false, lat: 49.8420, lon: 24.0300 },
+             { id: 6, city: "Odesa", rooms: 4, price: 7500000, area: 110, address: "Приморський бульв., 15", yearBuilt: 2021, images: ["https://placehold.co/400x300/FECACA/333333?text=Одеса+Квартира+6"], description: "Ексклюзивна 4-кімнатна квартира.", isEligible: false, lat: 46.4870, lon: 30.7400 },
+             { id: 7, city: "Kharkiv", rooms: 1, price: 1800000, area: 38, address: "вул. Сумська, 7", yearBuilt: 2023, images: ["https://placehold.co/400x300/A7F3D0/333333?text=Харків+Квартира+7"], description: "Нова 1-кімнатна квартира.", isEligible: true, lat: 50.0050, lon: 36.2310 },
+             { id: 8, city: "Kyiv", rooms: 1, price: 2500000, area: 45, address: "Андріївський узвіз, 18", yearBuilt: 2010, images: ["https://placehold.co/400x300/E9D5FF/333333?text=Київ+Квартира+8"], description: "Чарівна стара 1-кімнатна квартира.", isEligible: false, lat: 50.4600, lon: 30.5150 },
+             { id: 9, city: "Lviv", rooms: 3, price: 5200000, area: 88, address: "вул. Стрийська, 42", yearBuilt: 2016, images: ["https://placehold.co/400x300/BAE6FD/333333?text=Львів+Квартира+9"], description: "Елегантна 3-кімнатна квартира.", isEligible: false, lat: 49.8100, lon: 24.0250 },
+             { id: 10, city: "Bila Tserkva", rooms: 2, price: 1900000, area: 55, address: "вул. Якась, 5", yearBuilt: 2022, images: ["https://placehold.co/400x300/FFF7D4/333333?text=Біла+Церква+Кв"], description: "Гарна квартира.", isEligible: true, lat: 49.7981, lon: 30.1158 },
+             { id: 11, city: "Irpin", rooms: 1, price: 1500000, area: 35, address: "вул. Інша, 1", yearBuilt: 2023, images: ["https://placehold.co/400x300/CCEEFF/333333?text=Ірпінь+Кв"], description: "Нова студія.", isEligible: true, lat: 50.5167, lon: 30.2500 },
+             { id: 12, city: "Brovary", rooms: 2, price: 2800000, area: 60, address: "бул. Незалежності, 10", yearBuilt: 2015, images: ["https://placehold.co/400x300/D1FAE5/333333?text=Бровари+Кв"], description: "Квартира біля парку.", isEligible: false, lat: 50.5116, lon: 30.8130 },
+             { id: 13, city: "Vyshhorod", rooms: 1, price: 1750000, area: 42, address: "вул. Київська, 3", yearBuilt: 2020, images: ["https://placehold.co/400x300/FEF3C7/333333?text=Вишгород+Кв"], description: "Квартира з видом.", isEligible: true, lat: 50.5849, lon: 30.4917 },
+        ];
+        const cityCoordinates = { "Kyiv": { lat: 50.4501, lon: 30.5234 }, "Lviv": { lat: 49.8397, lon: 24.0297 }, "Odesa": { lat: 46.4825, lon: 30.7233 }, "Kharkiv": { lat: 49.9935, lon: 36.2304 }, "Vinnytsia": { lat: 49.2331, lon: 28.4682 }, "Lutsk": { lat: 50.7472, lon: 25.3254 }, "Dnipro": { lat: 48.4647, lon: 35.0462 }, "Zhytomyr": { lat: 50.2547, lon: 28.6587 }, "Uzhhorod": { lat: 48.6208, lon: 22.2879 }, "Zaporizhzhia": { lat: 47.8388, lon: 35.1396 }, "Ivano-Frankivsk": { lat: 48.9226, lon: 24.7111 }, "Kropyvnytskyi": { lat: 48.5079, lon: 32.2623 }, "Mykolaiv": { lat: 46.9750, lon: 31.9946 }, "Poltava": { lat: 49.5883, lon: 34.5514 }, "Rivne": { lat: 50.6199, lon: 26.2516 }, "Sumy": { lat: 50.9077, lon: 34.7981 }, "Ternopil": { lat: 49.5535, lon: 25.5948 }, "Kherson": { lat: 46.6354, lon: 32.6169 }, "Khmelnytskyi": { lat: 49.4229, lon: 26.9871 }, "Cherkasy": { lat: 49.4444, lon: 32.0598 }, "Chernivtsi": { lat: 48.2917, lon: 25.9358 }, "Chernihiv": { lat: 51.4982, lon: 31.2893 }, "Bila Tserkva": { lat: 49.7981, lon: 30.1158 }, "Brovary": { lat: 50.5116, lon: 30.8130 }, "Boryspil": { lat: 50.3481, lon: 30.9569 }, "Fastiv": { lat: 50.0769, lon: 29.9183 }, "Irpin": { lat: 50.5167, lon: 30.2500 }, "Obukhiv": { lat: 50.1253, lon: 30.6264 }, "Vyshhorod": { lat: 50.5849, lon: 30.4917 } };
+        const exchangeRates = { "UAH": 1, "USD": 40, "EUR": 43 };
+        const MAX_POSSIBLE_PRICE_UAH = 10000000;
+        const MIN_AREA = 20; const MAX_AREA = 120;
+        const BASE_AREA_PER_PERSON = 52.5;
+        const EXTRA_AREA_PER_PERSON = 21;
+        const AGE_LIMIT_3_PERCENT = 10; const AGE_LIMIT_7_PERCENT = 3; const AGE_LIMIT_MANUAL_MAX = 10;
+        const DEFAULT_MIN_PRICE_UAH = 0; const DEFAULT_MAX_PRICE_UAH = 6000000;
+        const DEFAULT_MAX_AGE = AGE_LIMIT_MANUAL_MAX;
+        const DEFAULT_FAMILY_SIZE = 1;
+        const DEFAULT_MIN_AREA = MIN_AREA; const DEFAULT_MAX_AREA = MAX_AREA;
+        const DEFAULT_MAX_DISTANCE = 50;
+        const CURRENT_YEAR = new Date().getFullYear(); const DEBOUNCE_DELAY = 300;
+        const CALC_MIN_PROP_VALUE = 500000; const CALC_MAX_PROP_VALUE = 10000000;
+        const CALC_DEFAULT_PROP_VALUE = 1500000;
+        const CALC_DEFAULT_DOWN_PERCENT = 20;
+        const CALC_MIN_DOWN_PERCENT = 10; // Updated minimum
+        const CALC_DEFAULT_TERM = 20;
+        const CALC_DEFAULT_RATE = 7;
+        const RATE_COEFFICIENT = 1.1;
+        const RATE_INCREASE_AFTER_10_YEARS = 3;
+
+
+        const resultsContainer = document.getElementById("results");
+        const noResultsMessage = document.getElementById("no-results-message");
+        const loadingOverlay = document.getElementById("loading-overlay");
+        const citySelect = document.getElementById("city");
+        const roomsSelect = document.getElementById("rooms");
+        const priceSliderElement = document.getElementById('price_slider');
+        const minPriceDisplay = document.getElementById("min_price_display");
+        const maxPriceDisplay = document.getElementById("max_price_display");
+        const areaSliderElement = document.getElementById('area_slider');
+        const areaLabel = document.getElementById('area_label');
+        const minAreaDisplay = document.getElementById('min_area_display');
+        const maxAreaDisplay = document.getElementById('max_area_display');
+        const recommendedAreaText = document.getElementById('recommended_area_text');
+        const propertyAgeSlider = document.getElementById("property_age_slider");
+        const minAgeDisplay = document.getElementById("min_age_display");
+        const maxAgeDisplay = document.getElementById("max_age_display");
+        const familySizeSlider = document.getElementById("family_size_slider");
+        const familySizeDisplay = document.getElementById("family_size_display");
+        const maxDistanceSlider = document.getElementById('max_distance_slider');
+        const minDistanceDisplay = document.getElementById("min_distance_display");
+        const maxDistanceDisplay = document.getElementById('max_distance_display');
+        const currencySelector = document.getElementById("currency_selector");
+        const programSelector = document.getElementById('program_selector');
+        const programAgeLimitText = document.getElementById("program_age_limit_text");
+        const distanceDisabledText = document.getElementById('distance_disabled_text');
+        const maxDistanceLabel = document.getElementById('max_distance_label');
+        const hideNotEligibleCheckbox = document.getElementById("hide_not_eligible");
+        const searchButton = document.getElementById("search_button");
+        const resetButton = document.getElementById("reset_button");
+        const currentYearSpan = document.getElementById("current_year");
+        const addPropertyLink = document.getElementById("add-property-link");
+        const addPropertyModal = document.getElementById("add-property-modal");
+        const addPropertyForm = document.getElementById("add-property-form");
+        const modalCloseBtn = document.getElementById("modal-close-btn");
+        const modalCancelBtn = document.getElementById("modal-cancel-btn");
+        const dragDropArea = document.getElementById('drag-drop-area');
+        const imageUploadInput = document.getElementById('new-image-upload');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        // Calculator elements
+        const calcPropertyValueSliderElement = document.getElementById('calc-property-value-slider');
+        const calcPropertyValueLabel = document.getElementById('calc-property-value-label');
+        const calcMinPropValueDisplay = document.getElementById('calc-min-prop-value');
+        const calcMaxPropValueDisplay = document.getElementById('calc-max-prop-value');
+        const calcDownPaymentPercentSliderElement = document.getElementById('calc-down-payment-percent-slider');
+        const calcDownPaymentPercentDisplay = document.getElementById('calc-down-payment-percent-display');
+        const calcMinDownPaymentPercentDisplay = document.getElementById('calc-min-down-payment-percent');
+        const calcMaxDownPaymentPercentDisplay = document.getElementById('calc-max-down-payment-percent');
+        const calcTermYearsInput = document.getElementById('calc-term-years');
+        const calcInterestRateSelector = document.getElementById('calc-interest-rate-selector');
+        // const calculateLoanBtn = document.getElementById('calculate-loan-btn');
+        const calcDownPaymentUahDisplay = document.getElementById('calc-down-payment-uah-display');
+        const calcLoanAmountDisplay = document.getElementById('calc-loan-amount');
+        const calcMonthlyPaymentDisplay = document.getElementById('calc-monthly-payment');
+
+
+        let priceSliderInstance;
+        let areaSliderInstance;
+        let calcPropValueSliderInstance;
+        let calcDownPaymentSliderInstance;
+        let uploadedImageDataUrl = null;
+
+        let state = {
+            currency: "UAH",
+            minPriceUAH: DEFAULT_MIN_PRICE_UAH,
+            maxPriceUAH: DEFAULT_MAX_PRICE_UAH,
+            maxAge: DEFAULT_MAX_AGE,
+            familySize: DEFAULT_FAMILY_SIZE,
+            minArea: DEFAULT_MIN_AREA,
+            maxArea: DEFAULT_MAX_AREA,
+            maxDistance: DEFAULT_MAX_DISTANCE,
+            selectedProgram: "",
+            effectiveAgeLimit: DEFAULT_MAX_AGE
+        };
+        let calcState = {
+            propertyValue: CALC_DEFAULT_PROP_VALUE,
+            downPaymentPercent: CALC_DEFAULT_DOWN_PERCENT,
+            termYears: CALC_DEFAULT_TERM,
+            interestRate: CALC_DEFAULT_RATE
+        };
+
+        let debounceTimer;
+
+        function debounce(func, wait) {
+             return function executedFunction(...args) {
+                 const later = () => { clearTimeout(debounceTimer); func.apply(this, args); };
+                 clearTimeout(debounceTimer);
+                 debounceTimer = setTimeout(later, wait);
+             };
+         }
+        function formatNumber(num) {
+             const number = parseFloat(String(num).replace(/,/g, ''));
+             if (isNaN(number)) return "";
+             return number.toLocaleString('uk-UA');
+        }
+        function convertPriceFromUAH(priceUAH, targetCurrency) {
+            if (priceUAH === null || typeof priceUAH !== 'number' || isNaN(priceUAH)) return null;
+            const rate = exchangeRates[targetCurrency];
+            if (!rate || rate === 0 || targetCurrency === "UAH") return priceUAH;
+            return Math.round(priceUAH / rate);
+        }
+        function convertPriceToUAH(priceConverted, sourceCurrency) {
+             if (priceConverted === null || typeof priceConverted !== 'number' || isNaN(priceConverted)) return null;
+             const rate = exchangeRates[sourceCurrency];
+             if (!rate || sourceCurrency === "UAH") return priceConverted;
+             return Math.round(priceConverted * rate);
+        }
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; const dLat = deg2rad(lat2 - lat1); const dLon = deg2rad(lon2 - lon1);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); const d = R * c; return d;
+        }
+        function deg2rad(deg) { return deg * (Math.PI / 180); }
+
+        function calculateRecommendedMaxArea(familySize) {
+            if (familySize <= 0) return 0;
+            if (familySize === 1) return BASE_AREA_PER_PERSON;
+            return BASE_AREA_PER_PERSON + (familySize - 1) * EXTRA_AREA_PER_PERSON;
+        }
+
+        function updateRecommendedAreaDisplay() {
+            const recommendedArea = calculateRecommendedMaxArea(state.familySize);
+            if (recommendedArea > 0) {
+                recommendedAreaText.textContent = `(Норма єОселя: до ${recommendedArea.toFixed(1)} м²)`;
+            } else {
+                recommendedAreaText.textContent = "";
+            }
+        }
+
+        function updatePriceDisplaySpans(values) {
+            minPriceDisplay.textContent = formatNumber(parseFloat(values[0]));
+            maxPriceDisplay.textContent = formatNumber(parseFloat(values[1]));
+        }
+        function updateAreaDisplaySpans(values) {
+            const minVal = formatNumber(parseFloat(values[0]));
+            const maxVal = formatNumber(parseFloat(values[1]));
+            minAreaDisplay.textContent = minVal;
+            maxAreaDisplay.textContent = maxVal;
+            areaLabel.textContent = `Площа: ${minVal} - ${maxVal} (м²)`;
+        }
+        function updateAgeDisplaySpans() {
+            minAgeDisplay.textContent = propertyAgeSlider.min;
+            maxAgeDisplay.textContent = propertyAgeSlider.value;
+        }
+        function updateFamilySizeDisplay() {
+            const value = state.familySize; let text;
+            if (value === 1) { text = "особа"; } else if (value >= 2 && value <= 4) { text = "особи"; } else { text = "осіб"; }
+            familySizeDisplay.textContent = `${value} ${text}`;
+            updateRecommendedAreaDisplay();
+        }
+         function updateDistanceDisplaySpans() {
+             minDistanceDisplay.textContent = maxDistanceSlider.min;
+             maxDistanceDisplay.textContent = state.maxDistance;
+         }
+         function updateDistanceLabel() {
+             const selectedCity = citySelect.value; const isDisabled = maxDistanceSlider.disabled;
+             if (selectedCity && !isDisabled) { maxDistanceLabel.textContent = `Макс. відстань від ${selectedCity} (${state.maxDistance} км)`; distanceDisabledText.classList.add('hidden'); }
+             else { maxDistanceLabel.textContent = `Макс. відстань від міста (км)`; distanceDisabledText.classList.remove('hidden'); }
+         }
+        function calculateEffectiveAgeLimit() {
+            if (state.selectedProgram === "3") return AGE_LIMIT_3_PERCENT;
+            if (state.selectedProgram === "7") return AGE_LIMIT_7_PERCENT;
+            return Math.min(parseInt(propertyAgeSlider.value, 10), AGE_LIMIT_MANUAL_MAX);
+        }
+        function syncPropertyAgeUI() {
+            state.effectiveAgeLimit = calculateEffectiveAgeLimit();
+            let disableSlider = false; let limitText = "";
+            if (state.selectedProgram === "3") { disableSlider = true; limitText = `(Ліміт програми 3%: ${AGE_LIMIT_3_PERCENT} років)`; }
+            else if (state.selectedProgram === "7") { disableSlider = true; limitText = `(Ліміт програми 7%: ${AGE_LIMIT_7_PERCENT} років)`; }
+            propertyAgeSlider.disabled = disableSlider;
+            if (disableSlider) { propertyAgeSlider.value = state.effectiveAgeLimit; }
+            else { propertyAgeSlider.value = Math.min(parseInt(propertyAgeSlider.value, 10), AGE_LIMIT_MANUAL_MAX); state.effectiveAgeLimit = parseInt(propertyAgeSlider.value, 10); }
+            updateAgeDisplaySpans();
+            programAgeLimitText.textContent = limitText;
+        }
+
+        function checkEligibility(yearBuilt) {
+             const age = CURRENT_YEAR - yearBuilt;
+             return age <= AGE_LIMIT_MANUAL_MAX;
+        }
+
+        function createPropertyCard(property) {
+            const propertyCard = document.createElement("div"); propertyCard.className = "property-card";
+            const img = document.createElement("img");
+            img.src = property.images[0] || `https://placehold.co/400x300/cccccc/ffffff?text=${encodeURIComponent(property.city)}+Apt`;
+            img.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x300/cccccc/ffffff?text=Помилка+фото'; this.alt = `Помилка завантаження фото для ${property.rooms}-кімн. квартири в ${property.city}`; };
+            img.alt = `${property.rooms}-кімн. квартира в ${property.city}`; img.loading = "lazy"; propertyCard.appendChild(img);
+            const cardContent = document.createElement("div"); cardContent.className = "card-content";
+            const title = document.createElement("h3"); title.className = "text-lg font-semibold text-gray-800 mb-1"; title.textContent = `${property.rooms}-кімн. Квартира`; cardContent.appendChild(title);
+            const address = document.createElement("p"); address.className = "text-sm text-gray-600 mb-2"; address.textContent = `${property.address}, ${property.city}`; cardContent.appendChild(address);
+            const price = document.createElement("p"); price.className = "text-xl font-bold text-blue-600 mb-3"; const displayPrice = convertPriceFromUAH(property.price, state.currency); price.textContent = `${formatNumber(displayPrice)} ${state.currency}`; cardContent.appendChild(price);
+            const description = document.createElement("p"); description.className = "text-gray-700 text-sm mb-4 flex-grow"; description.textContent = property.description; cardContent.appendChild(description);
+            const footerInfo = document.createElement("div"); footerInfo.className = "details-footer"; const age = CURRENT_YEAR - property.yearBuilt; const ageText = age === 0 ? "Новобудова" : age === 1 ? `${age} рік` : (age >= 2 && age <= 4) ? `${age} роки` : `${age} років`;
+            footerInfo.innerHTML = `<div class="flex justify-between items-center mb-2"><span>Побудовано: ${property.yearBuilt} (${ageText})</span><span>Площа: ${property.area} м²</span></div><div class="text-center mt-2"><span class="eligibility-badge ${property.isEligible ? 'eligible' : 'not-eligible'}">${property.isEligible ? 'Підходить під єОселя' : 'Не підходить'}</span></div>`;
+            cardContent.appendChild(footerInfo); propertyCard.appendChild(cardContent); return propertyCard;
+        }
+        function displayProperties(propertiesToDisplay) {
+            resultsContainer.innerHTML = "";
+            if (propertiesToDisplay.length === 0) { noResultsMessage.classList.remove('hidden'); }
+            else { noResultsMessage.classList.add('hidden'); propertiesToDisplay.forEach((property) => { const propertyCard = createPropertyCard(property); resultsContainer.appendChild(propertyCard); }); }
+        }
+        function filterAndDisplayProperties() {
+            loadingOverlay.classList.add('visible'); noResultsMessage.classList.add('hidden'); resultsContainer.innerHTML = "";
+            const selectedCityValue = citySelect.value; const selectedRoomsValue = roomsSelect.value; const hideIneligible = hideNotEligibleCheckbox.checked; const applyDistanceFilter = selectedCityValue && !maxDistanceSlider.disabled;
+            setTimeout(() => {
+                const filteredProperties = propertiesData.filter((property) => {
+                    const age = CURRENT_YEAR - property.yearBuilt;
+                    if (selectedCityValue && property.city !== selectedCityValue && !applyDistanceFilter) return false;
+                    if (selectedRoomsValue) { const roomsFilterNum = parseInt(selectedRoomsValue); if (roomsFilterNum === 4 && property.rooms < 4) return false; if (roomsFilterNum < 4 && property.rooms !== roomsFilterNum) return false; }
+                    if (state.minPriceUAH !== null && property.price < state.minPriceUAH) return false;
+                    if (state.maxPriceUAH !== null && property.price > state.maxPriceUAH) return false;
+                    if (age > state.effectiveAgeLimit) return false;
+                    if (state.minArea !== null && property.area < state.minArea) return false;
+                    if (state.maxArea !== null && property.area > state.maxArea) return false;
+                    if (applyDistanceFilter) { const cityCoord = cityCoordinates[selectedCityValue]; if (!cityCoord || typeof property.lat !== 'number' || typeof property.lon !== 'number') { console.warn(`Missing coordinates for city ${selectedCityValue} or property ID ${property.id}. Excluding.`); return false; } const distance = getDistanceFromLatLonInKm(cityCoord.lat, cityCoord.lon, property.lat, property.lon); if (distance > state.maxDistance) return false; }
+                    if (hideIneligible && !property.isEligible) return false;
+                    return true;
+                });
+                displayProperties(filteredProperties); loadingOverlay.classList.remove('visible');
+            }, 100);
+        }
+        const debouncedFilter = debounce(filterAndDisplayProperties, DEBOUNCE_DELAY);
+        function resetFilters() {
+            citySelect.value = "";
+            roomsSelect.value = "";
+            hideNotEligibleCheckbox.checked = false;
+            propertyAgeSlider.value = DEFAULT_MAX_AGE;
+            familySizeSlider.value = DEFAULT_FAMILY_SIZE;
+            maxDistanceSlider.value = DEFAULT_MAX_DISTANCE;
+            maxDistanceSlider.disabled = true;
+            state = {
+                currency: "UAH",
+                minPriceUAH: DEFAULT_MIN_PRICE_UAH, maxPriceUAH: DEFAULT_MAX_PRICE_UAH,
+                maxAge: DEFAULT_MAX_AGE, familySize: DEFAULT_FAMILY_SIZE,
+                minArea: DEFAULT_MIN_AREA, maxArea: DEFAULT_MAX_AREA,
+                maxDistance: DEFAULT_MAX_DISTANCE, selectedProgram: "",
+                effectiveAgeLimit: DEFAULT_MAX_AGE
+            };
+            currencySelector.querySelectorAll('.button-group-button').forEach(button => { const isSelected = button.dataset.currency === state.currency; button.classList.toggle('selected', isSelected); button.setAttribute('aria-checked', isSelected); });
+            programSelector.querySelectorAll('.button-group-button').forEach(button => { const isSelected = button.dataset.program === state.selectedProgram; button.classList.toggle('selected', isSelected); button.setAttribute('aria-checked', isSelected); });
+            updatePriceSlider();
+            priceSliderInstance.set([
+                convertPriceFromUAH(state.minPriceUAH, state.currency) ?? 0,
+                convertPriceFromUAH(state.maxPriceUAH, state.currency) ?? MAX_POSSIBLE_PRICE_UAH / exchangeRates[state.currency]
+            ]);
+            areaSliderInstance.set([state.minArea, state.maxArea]);
+            syncPropertyAgeUI();
+            updateFamilySizeDisplay(); // This now also updates recommended area text
+            updateDistanceDisplaySpans();
+            updateDistanceLabel();
+            areaLabel.textContent = `Площа: ${formatNumber(state.minArea)} - ${formatNumber(state.maxArea)} (м²)`;
+            recommendedAreaText.textContent = `(Норма єОселя: до ${calculateRecommendedMaxArea(state.familySize).toFixed(1)} м²)`;
+            filterAndDisplayProperties();
+        }
+        function updatePriceSlider() {
+            const minRangeConverted = convertPriceFromUAH(DEFAULT_MIN_PRICE_UAH, state.currency) ?? 0;
+            const maxRangeConverted = convertPriceFromUAH(MAX_POSSIBLE_PRICE_UAH, state.currency) ?? 100000;
+            const startMinConverted = convertPriceFromUAH(state.minPriceUAH, state.currency) ?? minRangeConverted;
+            const startMaxConverted = convertPriceFromUAH(state.maxPriceUAH, state.currency) ?? maxRangeConverted;
+            const stepConverted = Math.max(100, convertPriceFromUAH(10000, state.currency) || 100);
+            const sliderOptions = {
+                start: [startMinConverted, startMaxConverted],
+                connect: true,
+                step: stepConverted,
+                range: { 'min': minRangeConverted, 'max': maxRangeConverted },
+                format: { to: function (value) { return Math.round(value); }, from: function (value) { return Number(value); } }
+            };
+            if (priceSliderInstance) {
+                priceSliderInstance.updateOptions(sliderOptions, false);
+            } else {
+                priceSliderInstance = noUiSlider.create(priceSliderElement, sliderOptions);
+                priceSliderInstance.on('update', (values, handle) => { updatePriceDisplaySpans(values); });
+                 priceSliderInstance.on('set', (values, handle) => {
+                    const minValSlider = parseFloat(values[0]);
+                    const maxValSlider = parseFloat(values[1]);
+                     state.minPriceUAH = convertPriceToUAH(minValSlider, state.currency);
+                     if (maxValSlider >= maxRangeConverted * 0.999) { state.maxPriceUAH = null; }
+                     else { state.maxPriceUAH = convertPriceToUAH(maxValSlider, state.currency); }
+                    debouncedFilter();
+                });
+            }
+        }
+        function initializeAreaSlider() {
+            areaSliderInstance = noUiSlider.create(areaSliderElement, {
+                start: [state.minArea, state.maxArea],
+                connect: true,
+                step: 5,
+                range: { 'min': MIN_AREA, 'max': MAX_AREA },
+                 format: { to: function (value) { return Math.round(value); }, from: function (value) { return Number(value); } }
+            });
+            areaSliderInstance.on('update', (values, handle) => { updateAreaDisplaySpans(values); });
+             areaSliderInstance.on('set', (values, handle) => {
+                 state.minArea = parseFloat(values[0]);
+                 state.maxArea = parseFloat(values[1]);
+                 debouncedFilter();
+             });
+        }
+
+        function showModal() {
+            addPropertyModal.classList.remove('hidden');
+            addPropertyModal.classList.add('visible');
+            uploadedImageDataUrl = null;
+            imagePreviewContainer.innerHTML = '';
+            addPropertyForm.reset();
+        }
+
+        function hideModal() {
+            addPropertyModal.classList.remove('visible');
+            addPropertyModal.classList.add('hidden');
+             addPropertyForm.reset();
+             uploadedImageDataUrl = null;
+             imagePreviewContainer.innerHTML = '';
+        }
+
+        function handleFiles(files) {
+            imagePreviewContainer.innerHTML = '';
+            uploadedImageDataUrl = null;
+
+            const file = files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImageDataUrl = e.target.result;
+                    const img = document.createElement('img');
+                    img.src = uploadedImageDataUrl;
+                    imagePreviewContainer.appendChild(img);
+                }
+                reader.onerror = function(e) {
+                    console.error("FileReader error: ", e);
+                    alert("Помилка читання файлу.");
+                }
+                reader.readAsDataURL(file);
+            } else if (file) {
+                alert("Будь ласка, завантажте файл зображення.");
+                imageUploadInput.value = '';
+            }
+        }
+
+        dragDropArea.addEventListener('click', () => imageUploadInput.click());
+
+        imageUploadInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFiles(e.target.files);
+            }
+        });
+
+        dragDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragDropArea.classList.add('drag-over');
+        });
+
+        dragDropArea.addEventListener('dragleave', (e) => {
+            dragDropArea.classList.remove('drag-over');
+        });
+
+        dragDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragDropArea.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) {
+                imageUploadInput.files = e.dataTransfer.files;
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        addPropertyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showModal();
+        });
+
+        modalCloseBtn.addEventListener('click', hideModal);
+        modalCancelBtn.addEventListener('click', hideModal);
+        addPropertyModal.addEventListener('click', (e) => {
+             if (e.target === addPropertyModal) {
+                 hideModal();
+             }
+        });
+
+        addPropertyForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const city = document.getElementById('new-city').value.trim();
+            const rooms = parseInt(document.getElementById('new-rooms').value);
+            const price = parseInt(document.getElementById('new-price').value);
+            const area = parseInt(document.getElementById('new-area').value);
+            const address = document.getElementById('new-address').value.trim();
+            const year = parseInt(document.getElementById('new-year').value);
+            const description = document.getElementById('new-description').value.trim();
+
+            if (!city || isNaN(rooms) || rooms <= 0 || isNaN(price) || price < 0 || isNaN(area) || area <= 0 || !address || isNaN(year) || year < 1900 || year > CURRENT_YEAR) {
+                alert('Будь ласка, заповніть всі обов\'язкові поля коректно.');
+                return;
+            }
+
+            const isEligible = checkEligibility(year);
+
+            const newProperty = {
+                id: propertiesData.length > 0 ? Math.max(...propertiesData.map(p => p.id)) + 1 : 1,
+                city: city, rooms: rooms, price: price, area: area, address: address,
+                yearBuilt: year,
+                images: [uploadedImageDataUrl || `https://placehold.co/400x300/cccccc/ffffff?text=${encodeURIComponent(city)}+Apt`],
+                description: description || `${rooms}-кімн. квартира в ${city}`,
+                isEligible: isEligible,
+                lat: null, lon: null
+            };
+
+            propertiesData.push(newProperty);
+            hideModal();
+            filterAndDisplayProperties();
+        });
+
+
+        currencySelector.addEventListener("click", function(event) {
+            const targetButton = event.target.closest('.button-group-button');
+            if (targetButton && !targetButton.classList.contains('selected')) {
+                state.currency = targetButton.dataset.currency;
+                currencySelector.querySelectorAll('.button-group-button').forEach(button => { const isSelected = button === targetButton; button.classList.toggle('selected', isSelected); button.setAttribute('aria-checked', isSelected); });
+                updatePriceSlider();
+                filterAndDisplayProperties();
+            }
+        });
+        programSelector.addEventListener('click', function(event) {
+             const targetButton = event.target.closest('.button-group-button');
+             if (targetButton && !targetButton.classList.contains('selected')) {
+                 state.selectedProgram = targetButton.dataset.program;
+                 programSelector.querySelectorAll('.button-group-button').forEach(button => { const isSelected = button === targetButton; button.classList.toggle('selected', isSelected); button.setAttribute('aria-checked', isSelected); });
+                 syncPropertyAgeUI();
+                 filterAndDisplayProperties();
+             }
+        });
+        propertyAgeSlider.addEventListener("input", function() {
+            if (!this.disabled) {
+                state.maxAge = parseInt(this.value, 10);
+                state.effectiveAgeLimit = state.maxAge;
+                updateAgeDisplaySpans();
+                debouncedFilter();
+            }
+        });
+        familySizeSlider.addEventListener("input", function() {
+             state.familySize = parseInt(this.value);
+             updateFamilySizeDisplay();
+        });
+        maxDistanceSlider.addEventListener('input', function() {
+            if (!this.disabled) {
+                state.maxDistance = parseInt(this.value);
+                updateDistanceDisplaySpans();
+                updateDistanceLabel();
+                debouncedFilter();
+            }
+        });
+        citySelect.addEventListener('change', function() {
+            const citySelected = this.value !== ""; maxDistanceSlider.disabled = !citySelected;
+            if (!citySelected) { maxDistanceSlider.value = DEFAULT_MAX_DISTANCE; state.maxDistance = DEFAULT_MAX_DISTANCE; }
+            updateDistanceDisplaySpans();
+            updateDistanceLabel();
+            filterAndDisplayProperties();
+        });
+        roomsSelect.addEventListener('change', filterAndDisplayProperties);
+        hideNotEligibleCheckbox.addEventListener('change', filterAndDisplayProperties);
+        searchButton.addEventListener("click", filterAndDisplayProperties);
+        resetButton.addEventListener("click", resetFilters);
+
+        // --- Calculator Logic ---
+        function calculateMortgage() {
+            const propertyValue = calcState.propertyValue;
+            const downPaymentPercent = calcState.downPaymentPercent;
+            const termYears = parseInt(calcTermYearsInput.value) || 0;
+            const baseAnnualRate = calcState.interestRate;
+
+            // Apply coefficient to the base rate for calculation
+            const effectiveInitialAnnualRate = baseAnnualRate * RATE_COEFFICIENT;
+
+            if (propertyValue <= 0 || termYears <= 0 || effectiveInitialAnnualRate < 0 || downPaymentPercent < CALC_MIN_DOWN_PERCENT || downPaymentPercent > 100) {
+                calcDownPaymentUahDisplay.textContent = '0 UAH';
+                calcLoanAmountDisplay.textContent = '0 UAH';
+                calcMonthlyPaymentDisplay.textContent = '0 UAH';
+                return;
+            }
+
+            const downPaymentUah = (propertyValue * downPaymentPercent) / 100;
+            const loanAmount = propertyValue - downPaymentUah;
+
+            calcDownPaymentUahDisplay.textContent = `${formatNumber(Math.round(downPaymentUah))} UAH`;
+            calcLoanAmountDisplay.textContent = `${formatNumber(Math.round(loanAmount))} UAH`;
+
+            if (loanAmount <= 0) {
+                calcMonthlyPaymentDisplay.textContent = '0 UAH';
+                return;
+            }
+
+            // Calculate payment using the effective initial rate (base * coefficient)
+            const initialMonthlyRate = effectiveInitialAnnualRate / 12 / 100;
+            const numberOfPayments = termYears * 12;
+
+            let monthlyPayment;
+            if (initialMonthlyRate === 0) {
+                 monthlyPayment = loanAmount / numberOfPayments;
+            } else {
+                const factor = Math.pow(1 + initialMonthlyRate, numberOfPayments);
+                monthlyPayment = loanAmount * (initialMonthlyRate * factor) / (factor - 1);
+            }
+
+
+            if (isFinite(monthlyPayment)) {
+                // Display only the initial monthly payment
+                calcMonthlyPaymentDisplay.textContent = `${formatNumber(monthlyPayment.toFixed(2))} UAH`;
+            } else {
+                calcMonthlyPaymentDisplay.textContent = '0 UAH';
+            }
+        }
+
+        function initializeCalcPropValueSlider() {
+            calcPropValueSliderInstance = noUiSlider.create(calcPropertyValueSliderElement, {
+                start: [calcState.propertyValue],
+                connect: [true, false],
+                step: 10000,
+                range: { 'min': CALC_MIN_PROP_VALUE, 'max': CALC_MAX_PROP_VALUE },
+                format: { to: function (value) { return Math.round(value); }, from: function (value) { return Number(value); } }
+            });
+
+            calcMinPropValueDisplay.textContent = formatNumber(CALC_MIN_PROP_VALUE);
+            calcMaxPropValueDisplay.textContent = formatNumber(CALC_MAX_PROP_VALUE);
+
+            calcPropValueSliderInstance.on('update', (values, handle) => {
+                const value = parseFloat(values[0]);
+                calcPropertyValueLabel.textContent = `Вартість нерухомості: ${formatNumber(value)} UAH`;
+            });
+
+            calcPropValueSliderInstance.on('set', (values, handle) => {
+                calcState.propertyValue = parseFloat(values[0]);
+                calculateMortgage();
+            });
+        }
+
+        function initializeCalcDownPaymentSlider() {
+             calcDownPaymentSliderInstance = noUiSlider.create(calcDownPaymentPercentSliderElement, {
+                 start: [calcState.downPaymentPercent],
+                 connect: [true, false], // Connect lower side
+                 step: 1,
+                 range: {
+                     'min': CALC_MIN_DOWN_PERCENT, // Use updated minimum
+                     'max': 100
+                 },
+                 format: { to: function (value) { return Math.round(value); }, from: function (value) { return Number(value); } }
+             });
+
+             calcMinDownPaymentPercentDisplay.textContent = `${CALC_MIN_DOWN_PERCENT}%`; // Update display
+             calcMaxDownPaymentPercentDisplay.textContent = `100%`;
+
+             calcDownPaymentSliderInstance.on('update', (values, handle) => {
+                 const value = parseFloat(values[0]);
+                 calcDownPaymentPercentDisplay.textContent = `${value}`;
+             });
+
+             calcDownPaymentSliderInstance.on('set', (values, handle) => {
+                 calcState.downPaymentPercent = parseFloat(values[0]);
+                 calculateMortgage();
+             });
+        }
+
+
+        calcInterestRateSelector.addEventListener('click', function(event) {
+            const targetButton = event.target.closest('button');
+            if (targetButton && !targetButton.classList.contains('selected')) {
+                calcState.interestRate = parseFloat(targetButton.dataset.rate);
+                calcInterestRateSelector.querySelectorAll('button').forEach(button => {
+                    const isSelected = button === targetButton;
+                    button.classList.toggle('selected', isSelected);
+                    button.setAttribute('aria-checked', isSelected);
+                });
+                calculateMortgage();
+            }
+        });
+
+        calcTermYearsInput.addEventListener('input', () => {
+            let term = parseInt(calcTermYearsInput.value) || 0;
+            if (term < 1) term = 1;
+            if (term > 30) term = 30;
+            calcTermYearsInput.value = term;
+            calcState.termYears = term;
+            calculateMortgage();
+        });
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            currentYearSpan.textContent = CURRENT_YEAR;
+            updatePriceSlider();
+            initializeAreaSlider();
+            initializeCalcPropValueSlider();
+            initializeCalcDownPaymentSlider();
+            updateFamilySizeDisplay();
+            syncPropertyAgeUI();
+            updateDistanceDisplaySpans();
+            updateDistanceLabel();
+            areaLabel.textContent = `Площа: ${formatNumber(state.minArea)} - ${formatNumber(state.maxArea)} (м²)`;
+            filterAndDisplayProperties();
+            calculateMortgage();
+        });
+
+    </script>
+</body>
+</html>
